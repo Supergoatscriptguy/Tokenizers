@@ -2,22 +2,30 @@
 
 Tokenizers I trained for my models.
 
-## What's here
+## Structure
 
-| File | Type | Vocab | Trained on |
-|------|------|-------|------------|
-| `pile_tokenizer.json` | BPE | 50k | The Pile |
-| `fineweb_tokenizer.json` | BPE | 50k | FineWeb |
-| `fineweb_unigram.json` | Unigram | 50k | FineWeb |
-| `fineweb_wordpiece.json` | WordPiece | 50k | FineWeb |
+```
+fineweb/                     # Trained on FineWeb
+  fineweb_tokenizer.json     # BPE
+  fineweb_unigram.json       # Unigram
+  fineweb_wordpiece.json     # WordPiece
+
+pile/                        # Trained on The Pile
+  pile_tokenizer.json        # BPE
+
+scripts/                     # Training and testing
+  train_fineweb_tokenizer.py
+  train_pile_tokenizer.py
+  train_all_tokenizers.py
+  train_tokenizer.py
+  test_tokenizers.py
+```
 
 ## Which one should I use?
 
 Probably **BPE** or **Unigram**. They handle everything — code, special characters, newlines, etc.
 
 **WordPiece** breaks on newlines and special chars because it uses whitespace tokenization. Fine for BERT-style stuff but not great for code or raw text.
-
-Here's how they compare on some test strings:
 
 | Tokenizer | Avg tokens | Notes |
 |-----------|------------|-------|
@@ -31,7 +39,7 @@ Here's how they compare on some test strings:
 ```python
 from tokenizers import Tokenizer
 
-tokenizer = Tokenizer.from_file("fineweb_tokenizer.json")
+tokenizer = Tokenizer.from_file("fineweb/fineweb_tokenizer.json")
 
 tokens = tokenizer.encode("Hello world").ids
 text = tokenizer.decode(tokens)
@@ -40,33 +48,24 @@ text = tokenizer.decode(tokens)
 ## Testing
 
 ```bash
-# Test all tokenizers
-python test_tokenizers.py
+# Test all fineweb tokenizers
+python scripts/test_tokenizers.py --dir fineweb
 
-# Test specific one
-python test_tokenizers.py fineweb_unigram
+# Test pile tokenizer
+python scripts/test_tokenizers.py --dir pile
 ```
 
 ## Training your own
 
-Train all types at once:
 ```bash
-python train_all_tokenizers.py
-```
+# Train on FineWeb
+python scripts/train_fineweb_tokenizer.py
 
-Train specific types:
-```bash
-python train_all_tokenizers.py --types bpe,unigram
-```
+# Train on The Pile
+python scripts/train_pile_tokenizer.py
 
-Train on The Pile:
-```bash
-python train_pile_tokenizer.py
-```
-
-Train on FineWeb:
-```bash
-python train_fineweb_tokenizer.py
+# Train all types (BPE, Unigram, WordPiece)
+python scripts/train_all_tokenizers.py
 ```
 
 ## Install
